@@ -23,6 +23,10 @@ window/size/window_width_override=512
 window/size/window_height_override=256
 window/stretch/mode="canvas_items"
 
+[dotnet]
+
+project/assembly_name="bouncy"
+
 [layer_names]
 
 2d_physics/layer_1="paddle"
@@ -36,3 +40,4 @@ window/stretch/mode="canvas_items"
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true

@@ -1,28 +1,105 @@
-[gd_scene load_steps=4 format=3 uid="uid://dy6iv0x8udb1v"]
+[gd_scene load_steps=15 format=3 uid="uid://dy6iv0x8udb1v"]
 
 [ext_resource type="Script" path="res://ball.gd" id="1_b2blh"]
+[ext_resource type="Script" path="res://trail.gd" id="2_5dpts"]
+[ext_resource type="Texture2D" uid="uid://d37m7oxcedb2d" path="res://explosion_fx_mugen_sprite_sheet_nzc__by_boltanim_dgvhhh6-fullview.png" id="3_g6fdb"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_rw2ro"]
 radius = 4.0
+
+[sub_resource type="Curve" id="Curve_ofh6y"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0.36803), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="Gradient_yvo0y"]
+colors = PackedColorArray(1, 1, 1, 0.666667, 1, 1, 1, 1)
 
 [sub_resource type="Curve" id="Curve_vxm1a"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 2
 
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_7wpc6"]
+particles_animation = true
+particles_anim_h_frames = 4
+particles_anim_v_frames = 2
+particles_anim_loop = false
+
+[sub_resource type="Gradient" id="Gradient_2f3bb"]
+offsets = PackedFloat32Array(0, 0.215686, 0.45098, 0.696078, 1)
+colors = PackedColorArray(1, 1, 0, 1, 1, 1, 1, 1, 1, 0.45098, 0, 1, 1, 0, 0.219608, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_yxhgo"]
+gradient = SubResource("Gradient_2f3bb")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_j22w2"]
+angle_min = 1.07288e-05
+angle_max = 360.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.1
+scale_max = 0.2
+color_ramp = SubResource("GradientTexture1D_yxhgo")
+anim_speed_min = 1.0
+anim_speed_max = 1.0
+
+[sub_resource type="Animation" id="Animation_ovc81"]
+resource_name = "Bounce"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Polygon2D:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(-2, -2, -2),
+"update": 0,
+"values": [Vector2(0.5, 0.5), Vector2(1.5, 1.5), Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_snius"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Polygon2D:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0.5, 0.5)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_p4gui"]
+_data = {
+"Bounce": SubResource("Animation_ovc81"),
+"RESET": SubResource("Animation_snius")
+}
+
 [node name="Ball" type="CharacterBody2D"]
-position = Vector2(-4, -4)
 collision_layer = 2
 collision_mask = 13
 motion_mode = 1
 script = ExtResource("1_b2blh")
 
 [node name="Polygon2D" type="Polygon2D" parent="."]
+position = Vector2(-1.19209e-07, -2.38419e-07)
+scale = Vector2(0.5, 0.5)
 color = Color(1, 1, 0, 1)
 polygon = PackedVector2Array(1, 1, 3, 0, 5, 0, 7, 1, 8, 3, 8, 4, 8, 5, 7, 7, 5, 8, 4, 8, 3, 8, 1, 7, 0, 5, 0, 4, 0, 3)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(4, 4)
 shape = SubResource("CircleShape2D_rw2ro")
+
+[node name="Trail" type="Line2D" parent="CollisionShape2D"]
+position = Vector2(-4, -4)
+points = PackedVector2Array(4, 4, 4, 4)
+width_curve = SubResource("Curve_ofh6y")
+gradient = SubResource("Gradient_yvo0y")
+script = ExtResource("2_5dpts")
 
 [node name="CPUParticles2D" type="CPUParticles2D" parent="."]
 position = Vector2(4, 4)
@@ -34,3 +111,17 @@ initial_velocity_max = 15.0
 scale_amount_min = 3.0
 scale_amount_max = 3.0
 scale_amount_curve = SubResource("Curve_vxm1a")
+
+[node name="Explotionparticle" type="GPUParticles2D" parent="."]
+material = SubResource("CanvasItemMaterial_7wpc6")
+emitting = false
+amount = 1
+process_material = SubResource("ParticleProcessMaterial_j22w2")
+texture = ExtResource("3_g6fdb")
+one_shot = true
+speed_scale = 1.5
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_p4gui")
+}

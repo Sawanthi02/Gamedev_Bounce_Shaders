@@ -1,7 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://d2uopcpeaxl8o"]
+[gd_scene load_steps=7 format=3 uid="uid://d2uopcpeaxl8o"]
 
+[ext_resource type="Script" path="res://game.gd" id="1_m0ohu"]
 [ext_resource type="PackedScene" uid="uid://dy6iv0x8udb1v" path="res://ball.tscn" id="2_u88ny"]
 [ext_resource type="PackedScene" uid="uid://8u50fc06u2ye" path="res://tile.tscn" id="3_twn5j"]
+[ext_resource type="Script" path="res://camera_2d.gd" id="4_s4rw1"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ar8xm"]
 size = Vector2(160, 16)
@@ -10,24 +12,25 @@ size = Vector2(160, 16)
 size = Vector2(16, 96)
 
 [node name="Game" type="Node2D"]
+script = ExtResource("1_m0ohu")
 
 [node name="Boundaries" type="StaticBody2D" parent="."]
 collision_layer = 4
 collision_mask = 0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries"]
+[node name="CollisionShapeTop" type="CollisionShape2D" parent="Boundaries"]
 position = Vector2(64, -8)
 shape = SubResource("RectangleShape2D_ar8xm")
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Boundaries"]
+[node name="CollisionShapeBottom" type="CollisionShape2D" parent="Boundaries"]
 position = Vector2(64, 72)
 shape = SubResource("RectangleShape2D_ar8xm")
 
-[node name="CollisionShape2D3" type="CollisionShape2D" parent="Boundaries"]
+[node name="CollisionShapeLeft" type="CollisionShape2D" parent="Boundaries"]
 position = Vector2(-8, 32)
 shape = SubResource("RectangleShape2D_6j2en")
 
-[node name="CollisionShape2D4" type="CollisionShape2D" parent="Boundaries"]
+[node name="CollisionShapeRight" type="CollisionShape2D" parent="Boundaries"]
 position = Vector2(136, 32)
 shape = SubResource("RectangleShape2D_6j2en")
 
@@ -687,12 +690,23 @@ direction = Vector2(-1, 0)
 
 [node name="Ball2" parent="." instance=ExtResource("2_u88ny")]
 unique_name_in_owner = true
-position = Vector2(0, 0)
 collision_layer = 32
 collision_mask = 20
 
 [node name="Polygon2D" parent="Ball2" index="0"]
 color = Color(0, 0, 1, 1)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(64, 32)
+script = ExtResource("4_s4rw1")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.7
+one_shot = true
+
+[connection signal="bounced" from="Ball1" to="." method="_on_ball_1_bounced"]
+[connection signal="bounced" from="Ball2" to="." method="_on_ball_2_bounced"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
 
 [editable path="Ball1"]
 [editable path="Ball2"]

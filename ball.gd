@@ -1,8 +1,12 @@
 extends CharacterBody2D
 class_name Ball
 
+signal bounced
+
 @onready var cpu_particles_2d: CPUParticles2D = $CPUParticles2D
 @onready var polygon_2d: Polygon2D = $Polygon2D
+@onready var animation_player: AnimationPlayer = $AnimationPlayer
+@onready var explotionparticle: GPUParticles2D = $Explotionparticle
 
 
 @export var is_ball_one := false
@@ -23,11 +27,12 @@ func _ready() -> void:
 	velocity.x = -speed
 	velocity.y = randi_range(-15, 15) # randomize that starting velocity a bit.
 
-	# Set the correct colours
-	polygon_2d.color = colour_ball_one if is_ball_one else colour_ball_two
-	cpu_particles_2d.color = colour_ball_one if is_ball_one else colour_ball_two
+
 
 func _physics_process(delta: float) -> void:
+	polygon_2d.color = colour_ball_one if is_ball_one else colour_ball_two
+	cpu_particles_2d.color = colour_ball_one if is_ball_one else colour_ball_two
+	
 	# Set the direction for the particles effect
 	cpu_particles_2d.direction = -velocity.normalized()
 
@@ -36,16 +41,16 @@ func _physics_process(delta: float) -> void:
 	if collision:
 		# Bounce the velocity to the ball collides
 		velocity = velocity.bounce(collision.get_normal())
-
+		animation_player.play("Bounce")
+		
+		explotionparticle.global_position = collision.get_position()
+		explotionparticle.restart()
+		
 		# If the collision is with a tile, toggle it
 		if collision.get_collider() is Tile:
 			collision.get_collider().toggle(self)
 			cpu_particles_2d.emitting = true
-
-		# Some juicyness
-		var tween = get_tree().create_tween()
-		tween.tween_property(polygon_2d, 'scale', Vector2(1.5, 1.5), .05)
-		tween.chain().tween_property(polygon_2d, 'scale', Vector2.ONE, .05)
+			bounced.emit()
 
 
 func _get_collision_layer() -> int:
